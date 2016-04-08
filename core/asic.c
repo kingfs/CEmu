@@ -10,7 +10,7 @@
 #include "spi.h"
 #include "backlight.h"
 #include "timers.h"
-#include "usb.h"
+#include "usb/usb.h"
 #include "realclock.h"
 #include "sha256.h"
 #include "emu.h"
