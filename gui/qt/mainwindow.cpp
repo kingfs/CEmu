@@ -412,7 +412,6 @@ MainWindow::MainWindow(CEmuOpts &cliOpts, QWidget *p) : QMainWindow(p), ui(new U
     connect(ui->buttonRunLuaScript, &QPushButton::clicked, this, &MainWindow::runLuaScript);
     connect(ui->buttonLoadLuaScript, &QPushButton::clicked, this, &MainWindow::loadLuaScript);
     connect(ui->buttonSaveLuaScript, &QPushButton::clicked, this, &MainWindow::saveLuaScript);
-    initLuaThings();
 
     // Meta Types
     qRegisterMetaType<uint32_t>("uint32_t");
