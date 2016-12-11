@@ -74,6 +74,8 @@ namespace autotester
     void sendKey(uint16_t key);
     void sendLetterKeyPress(char letter);
 
+    extern const std::function<void(const std::string&)> pressKeyFromName;
+
     bool launchCommand(const std::pair<std::string, std::string>& command);
 
     bool loadJSONConfig(const std::string& jsonContents);
