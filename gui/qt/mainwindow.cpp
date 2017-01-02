@@ -108,7 +108,17 @@ MainWindow::MainWindow(CEmuOpts &cliOpts, QWidget *p) : QMainWindow(p), ui(new U
     keypadBridge = new QtKeypadBridge(this);
     connect(keypadBridge, &QtKeypadBridge::keyStateChanged, ui->keypadWidget, &KeypadWidget::changeKeyState);
     installEventFilter(keypadBridge);
+
+    ui->centralWidget->installEventFilter(keypadBridge);
+    ui->screenWidget->installEventFilter(keypadBridge);
+    ui->tabWidget->installEventFilter(keypadBridge);
+
+    // Same for all the tabs/docks (iterate over them instead of hardcoding their names)
+    // ... except the Lua scripting one, which has things that can be used while emulation isn't paused
     for (const auto &tab : ui->tabWidget->children()[0]->children()) {
+        if (tab == ui->tabScripting) {
+            continue;
+        }
         tab->installEventFilter(keypadBridge);
     }
 
