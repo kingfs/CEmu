@@ -248,7 +248,8 @@ SOURCES += \
     visualizerwidget.cpp \
     debugger/visualizerdisplaywidget.cpp \
     memorywidget.cpp \
-    debugger/sourceswidget.cpp
+    debugger/sourceswidget.cpp \
+    debugger/cdebughighlighter.cpp \
     archive/extractor.c \
     runerbot/ops.c \
     runerbot/parse.c \
@@ -337,7 +338,8 @@ HEADERS  += \
     tivarslib/TypeHandlers/TypeHandlers.h \
     visualizerwidget.h \
     debugger/visualizerdisplaywidget.h \
-    debugger/sourceswidget.h
+    debugger/sourceswidget.h \
+    debugger/cdebughighlighter.h \
     archive/extractor.h \
     runerbot/runerbot.h \
     ../../core/bus.h \

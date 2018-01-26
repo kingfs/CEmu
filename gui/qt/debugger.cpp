@@ -772,7 +772,7 @@ void MainWindow::breakSetPrev(QTableWidgetItem *curr_item) {
 void MainWindow::breakRemoveRow(int row) {
     uint32_t address = static_cast<uint32_t>(hex2int(m_breakpoints->item(row, BREAK_ADDR_LOC)->text()));
 
-    debug_watch(address, DBG_MASK_EXEC, false);
+    changeDebugPoint(address, DBG_MASK_EXEC, false);
     if (!m_guiAdd && !m_useSoftCom) {
         disasmUpdate();
     }
@@ -806,7 +806,7 @@ void MainWindow::breakModified(QTableWidgetItem *item) {
 
     if (col == BREAK_ENABLE_LOC) {
         addr = static_cast<uint32_t>(hex2int(m_breakpoints->item(row, BREAK_ADDR_LOC)->text()));
-        debug_watch(addr, DBG_MASK_EXEC, item->checkState() == Qt::Checked);
+        changeDebugPoint(addr, DBG_MASK_EXEC, item->checkState() == Qt::Checked);
     } else if (col == BREAK_LABEL_LOC) {
         updateLabels();
     } else if (col == BREAK_ADDR_LOC){
@@ -846,9 +846,9 @@ void MainWindow::breakModified(QTableWidgetItem *item) {
         mask = ((m_breakpoints->item(row, BREAK_ENABLE_LOC)->checkState() == Qt::Checked) ? DBG_MASK_EXEC
                                                                                                : DBG_MASK_NONE);
 
-        debug_watch(m_prevBreakAddr, DBG_MASK_EXEC, false);
+        changeDebugPoint(m_prevBreakAddr, DBG_MASK_EXEC, false);
         item->setText(addrString);
-        debug_watch(addr, mask, true);
+        changeDebugPoint(addr, mask, true);
         m_breakpoints->blockSignals(false);
     }
     disasmUpdate();
@@ -872,6 +872,11 @@ void MainWindow::breakToggle(quint32 address, bool gui) {
     breakAdd(breakNextLabel(), address, true, true);
 
     m_guiAdd = false;
+}
+
+void MainWindow::changeDebugPoint(quint32 address, unsigned type, bool state) {
+    debug_watch(address, type, state);
+    emit debugPointChanged(address, type, state);
 }
 
 void MainWindow::breakAddGui() {
@@ -954,7 +959,7 @@ bool MainWindow::breakAdd(const QString &label, uint32_t addr, bool enabled, boo
     m_breakpoints->setCurrentCell(row, BREAK_ADDR_LOC);
     m_breakpoints->setUpdatesEnabled(true);
 
-    debug_watch(addr, DBG_MASK_EXEC, enabled);
+    changeDebugPoint(addr, DBG_MASK_EXEC, enabled);
 
     if (!m_guiAdd && !m_useSoftCom) {
         disasmUpdate();
@@ -1141,7 +1146,7 @@ void MainWindow::watchSetPrev(QTableWidgetItem *item) {
 void MainWindow::watchRemoveRow(int row) {
     uint32_t address = static_cast<uint32_t>(hex2int(m_watchpoints->item(row, WATCH_ADDR_LOC)->text()));
 
-    debug_watch(address, DBG_MASK_READ | DBG_MASK_WRITE, false);
+    changeDebugPoint(address, DBG_MASK_READ | DBG_MASK_WRITE, false);
 
     if (!m_guiAdd && !m_useSoftCom) {
         disasmUpdate();
@@ -1317,7 +1322,7 @@ bool MainWindow::watchAdd(const QString& label, uint32_t address, uint8_t len, u
     m_watchpoints->setUpdatesEnabled(true);
 
     // actually set it in the debugger core
-    debug_watch(address, mask, true);
+    changeDebugPoint(address, mask, true);
 
     if (!m_guiAdd && !m_useSoftCom) {
         disasmUpdate();
@@ -1391,7 +1396,7 @@ void MainWindow::watchModified(QTableWidgetItem *item) {
         if (col == WATCH_WRITE_LOC) { // Break on write
             mask = DBG_MASK_WRITE;
         }
-        debug_watch(address, mask, item->checkState() == Qt::Checked);
+        changeDebugPoint(address, mask, item->checkState() == Qt::Checked);
     } else if (col == WATCH_ADDR_LOC){
         std::string s = item->text().toUpper().toStdString();
         QString equate;
@@ -1428,9 +1433,9 @@ void MainWindow::watchModified(QTableWidgetItem *item) {
         mask = ((m_watchpoints->item(row, WATCH_READ_LOC)->checkState() == Qt::Checked) ? DBG_MASK_READ : DBG_MASK_NONE)|
                ((m_watchpoints->item(row, WATCH_WRITE_LOC)->checkState() == Qt::Checked) ? DBG_MASK_WRITE : DBG_MASK_NONE);
 
-        debug_watch(m_prevWatchAddr, DBG_MASK_READ | DBG_MASK_WRITE, false);
+        changeDebugPoint(m_prevWatchAddr, DBG_MASK_READ | DBG_MASK_WRITE, false);
         item->setText(newString);
-        debug_watch(address, mask, true);
+        changeDebugPoint(address, mask, true);
         watchPopulate(row);
     }
     m_watchpoints->blockSignals(false);
@@ -1491,9 +1496,9 @@ void MainWindow::updateLabels() {
                                 (m_watchpoints->item(row, WATCH_WRITE_LOC)->checkState() == Qt::Checked ? DBG_MASK_WRITE : DBG_MASK_NONE);
             // remove old watchpoint and add new one
             m_watchpoints->blockSignals(true);
-            debug_watch(static_cast<uint32_t>(hex2int(old)), mask, false);
+            changeDebugPoint(static_cast<uint32_t>(hex2int(old)), mask, false);
             m_watchpoints->item(row, WATCH_ADDR_LOC)->setText(next);
-            debug_watch(static_cast<uint32_t>(hex2int(next)), mask, true);
+            changeDebugPoint(static_cast<uint32_t>(hex2int(next)), mask, true);
             watchPopulate(row);
             m_watchpoints->blockSignals(true);
         }
@@ -1504,9 +1509,9 @@ void MainWindow::updateLabels() {
         if (!next.isEmpty() && next != old) {
             unsigned int mask = m_breakpoints->item(row, BREAK_ENABLE_LOC)->checkState() == Qt::Checked ? DBG_MASK_EXEC : DBG_MASK_NONE;
             m_breakpoints->blockSignals(true);
-            debug_watch(static_cast<uint32_t>(hex2int(old)), mask, false);
+            changeDebugPoint(static_cast<uint32_t>(hex2int(old)), mask, false);
             m_breakpoints->item(row, BREAK_ADDR_LOC)->setText(next);
-            debug_watch(static_cast<uint32_t>(hex2int(next)), mask, true);
+            changeDebugPoint(static_cast<uint32_t>(hex2int(next)), mask, true);
             m_breakpoints->blockSignals(false);
         }
     }
