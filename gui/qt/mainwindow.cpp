@@ -166,6 +166,7 @@ MainWindow::MainWindow(CEmuOpts &cliOpts, QWidget *p) : QMainWindow(p), ui(new U
     connect(ui->buttonCertID, &QPushButton::clicked, this, &MainWindow::setCalcId);
     connect(m_disasm, &DataWidget::gotoDisasmAddress, this, &MainWindow::gotoDisasmAddr);
     connect(m_disasm, &DataWidget::gotoMemoryAddress, this, &MainWindow::gotoMemAddr);
+    connect(ui->sources, &SourcesWidget::runUntilTriggered, this, &MainWindow::runUntil);
     connect(ui->sources, &SourcesWidget::breakToggled, this, &MainWindow::breakToggle);
     connect(this, &MainWindow::debugPointChanged, ui->sources, &SourcesWidget::updateAddr);
 
@@ -2281,7 +2282,7 @@ void MainWindow::contextDisasm(const QPoint &posa) {
     QString toggleWrite = tr("Toggle Write Watchpoint");
     QString toggleRead = tr("Toggle Read Watchpoint");
     QString toggleRw = tr("Toggle Read/Write Watchpoint");
-    QString runUntil = tr("Run Until");
+    QString runUntilStr = tr("Run Until");
     QString gotoMem = tr("Goto Memory View");
 
     m_disasm->setTextCursor(m_disasm->cursorForPosition(posa));
@@ -2290,7 +2291,7 @@ void MainWindow::contextDisasm(const QPoint &posa) {
     uint32_t addr = static_cast<uint32_t>(hex2int(addrStr));
 
     QMenu menu;
-    menu.addAction(runUntil);
+    menu.addAction(runUntilStr);
     menu.addSeparator();
     menu.addAction(toggleBreak);
     menu.addAction(toggleRead);
@@ -2314,10 +2315,8 @@ void MainWindow::contextDisasm(const QPoint &posa) {
             watchAddGuiW();
         } else if (item->text() == toggleRw) {
             watchAddGuiRW();
-        } else if (item->text() == runUntil) {
-            m_runUntilAddr = addr;
-            debugToggle();
-            debugStep(DBG_RUN_UNTIL);
+        } else if (item->text() == runUntilStr) {
+            runUntil(addr);
         } else if (item->text() == gotoMem) {
             gotoMemAddr(addr);
         }

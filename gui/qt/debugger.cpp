@@ -2325,6 +2325,12 @@ void MainWindow::stepOut() {
     debugStep(DBG_STEP_OUT);
 }
 
+void MainWindow::runUntil(uint32_t addr) {
+    m_runUntilAddr = addr;
+    debugToggle();
+    debugStep(DBG_RUN_UNTIL);
+}
+
 //------------------------------------------------
 // Other Functions
 //------------------------------------------------
