@@ -3,6 +3,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QObject>
+#include <QtCore/QTimer>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QPlainTextEdit>
 #include <QtGui/QSyntaxHighlighter>
@@ -103,6 +104,7 @@ class BasicCodeViewerWindow : public QDialog {
 
 public:
     explicit BasicCodeViewerWindow(QWidget *p = Q_NULLPTR);
+    void getAndProcessCurrExecPos();
     void setVariableName(const QString &name);
     void setOriginalCode(const QString &code);
     ~BasicCodeViewerWindow() override;
@@ -123,6 +125,7 @@ private:
     bool m_showingWrapped = false;
     bool m_showingFormatted = false;
     bool hasCodeYet = false;
+    QTimer* currExecTimer;
 };
 
 #endif
