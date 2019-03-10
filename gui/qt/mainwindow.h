@@ -153,6 +153,13 @@ private:
     };
 
     enum {
+        USB_SELECTED,
+        USB_VID,
+        USB_PID,
+        USB_REMOVE
+    };
+
+    enum {
         SLOT_NAME,
         SLOT_LOAD,
         SLOT_SAVE,
@@ -429,6 +436,14 @@ private:
     void recentLoadInfo();
     void recentSaveInfo();
 
+    // usb configuration
+    void usbSaveInfo();
+    void usbLoadInfo();
+    void usbRemoveRow();
+    void usbAddRow(const QString &vid = QStringLiteral(""), const QString &pid = QStringLiteral(""), Qt::CheckState check = Qt::Unchecked);
+    void usbSelectChange(int state);
+    void usbIdModified(QTableWidgetItem *item);
+
     // autotester
     int autotesterOpen(const QString &jsonPath);
     void autotesterUpdatePresets(int comboBoxIdx);
@@ -701,6 +716,9 @@ private:
     static const QString SETTING_ENABLE_WIN_CONSOLE;
     static const QString SETTING_RECENT_SAVE;
     static const QString SETTING_RECENT_PATHS;
+    static const QString SETTING_USB_VID;
+    static const QString SETTING_USB_PID;
+    static const QString SETTING_USB_SELECTED;
     static const QString SETTING_RECENT_SELECT;
 
     static const QString SETTING_KEYPAD_CEMU;

@@ -167,6 +167,10 @@ MainWindow::MainWindow(CEmuOpts &cliOpts, QWidget *p) : QMainWindow(p), ui(new U
     connect(m_disasm, &DataWidget::gotoDisasmAddress, this, &MainWindow::gotoDisasmAddr);
     connect(m_disasm, &DataWidget::gotoMemoryAddress, this, &MainWindow::gotoMemAddr);
 
+    // usb configuration options
+    connect(ui->buttonAddUSB, &QPushButton::clicked, [this]{ usbAddRow(); });
+    connect(ui->usbTable, &QTableWidget::itemChanged, this, &MainWindow::usbIdModified);
+
     // ctrl + click
     connect(ui->console, &QPlainTextEdit::cursorPositionChanged, [this]{ handleCtrlClickText(ui->console); });
     connect(ui->stackView, &QPlainTextEdit::cursorPositionChanged, [this]{ handleCtrlClickText(ui->stackView); });
@@ -862,6 +866,7 @@ void MainWindow::setup() {
 
     stateLoadInfo();
     recentLoadInfo();
+    usbLoadInfo();
 
     if (m_config->value(SETTING_DEBUGGER_RESTORE_ON_OPEN).toBool()) {
         if (!opts.debugFile.isEmpty()) {

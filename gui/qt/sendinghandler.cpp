@@ -116,7 +116,7 @@ void SendingHandler::resendPressed() {
 }
 
 void SendingHandler::removeRow() {
-    for (int row = 0; row < m_table->rowCount(); row++){
+    for (int row = 0; row < m_table->rowCount(); row++) {
         if (sender() == m_table->cellWidget(row, RECENT_REMOVE)) {
             m_table->removeRow(row);
             break;
