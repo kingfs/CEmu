@@ -12,6 +12,8 @@
 #include <chrono>
 #include <condition_variable>
 
+struct libusb_device;
+
 #define CONSOLE_BUFFER_SIZE 512
 
 class EmuThread : public QThread {
@@ -27,8 +29,9 @@ public:
     void debug(bool);
     void doStuff();
     void throttleWait();
-    void usbDetach();
-    void usbAttach(int vid, int pid);
+#ifdef HAS_LIBUSB
+    void setUsbDevice(libusb_device *device);
+#endif
     void setSpeed(int value);
     void setThrottle(bool state);
     void writeConsole(int console, const char *format, va_list args);
@@ -52,8 +55,7 @@ public:
         RequestSend,
         RequestReceive,
         RequestAutoTester,
-        RequestUSBDetach,
-        RequestUSBAttach,
+        RequestSetUsbDevice,
         RequestDebugger
     };
 
@@ -111,7 +113,7 @@ private:
     emu_data_t m_saveType;
     emu_data_t m_loadType;
 
-    int m_pid, m_vid;
+    libusb_device *m_usbDevice;
     int m_speed, m_actualSpeed;
     bool m_throttle;
     std::chrono::steady_clock::time_point m_lastTime;
